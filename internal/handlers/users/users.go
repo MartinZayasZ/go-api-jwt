@@ -39,12 +39,13 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	user := types.User{
 		FirstName: r.FormValue("first_name"),
 		LastName:  r.FormValue("last_name"),
+		Email:     r.FormValue("email"),
 		Username:  r.FormValue("username"),
 		Password:  r.FormValue("password"),
 		Status:    status,
-		CreatedAt: r.FormValue("created_at"),
+		CreatedAt: "",
 		CreatedBy: createdBy,
-		UpdatedAt: r.FormValue("updated_at"),
+		UpdatedAt: "",
 		UpdatedBy: updatedBy,
 	}
 
@@ -52,7 +53,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		output.JsonResponse(w, struct{ Message string }{
-			Message: err.Error(),
+			Message: "El username o email ya se encuentra registrado", //err.Error(),
 		}, http.StatusInternalServerError, 0)
 
 		return
@@ -82,21 +83,35 @@ func validateForm(r *http.Request) (types.User, error) {
 		validationErrors = append(validationErrors, "El username necesita un mínimo de 3 caracteres")
 	}
 
-	/*// Validate Email
+	data.FirstName = strings.TrimSpace(r.FormValue("first_name"))
+	if data.FirstName == "" {
+		validationErrors = append(validationErrors, "El nombre es requerido")
+	} else if len(data.FirstName) < 3 {
+		validationErrors = append(validationErrors, "El nombre necesita un mínimo de 3 caracteres")
+	}
+
+	data.LastName = strings.TrimSpace(r.FormValue("last_name"))
+	if data.LastName == "" {
+		validationErrors = append(validationErrors, "El apellido es requerido")
+	} else if len(data.LastName) < 3 {
+		validationErrors = append(validationErrors, "El apellido necesita un mínimo de 3 caracteres")
+	}
+
+	// Validate Email
 	data.Email = r.FormValue("email")
 	if !strings.Contains(data.Email, "@") {
 		validationErrors = append(validationErrors, "Invalid email address")
+	} else if len(data.Email) < 3 {
+		validationErrors = append(validationErrors, "El correo necesita un mínimo de 3 caracteres")
 	}
 
-	// Validate Age
-	ageStr := r.FormValue("age")
-	age, err := strconv.Atoi(ageStr)
-	if err != nil || age <= 0 {
-		validationErrors = append(validationErrors, "Invalid age")
-	} else {
-		data.Age = age
+	// Validate password
+	data.Password = r.FormValue("password")
+	if data.Password == "" {
+		validationErrors = append(validationErrors, "La contraseña es requerida")
+	} else if len(data.Password) < 8 {
+		validationErrors = append(validationErrors, "La contraseña necesita un mínimo de 8 caracteres")
 	}
-	*/
 
 	// Return errors if any
 	if len(validationErrors) > 0 {
