@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func RegisterHandlers(r *http.ServeMux) {
@@ -36,18 +38,24 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	createdBy, _ := strconv.Atoi(r.FormValue("created_by"))
 	updatedBy, _ := strconv.Atoi(r.FormValue("updated_by"))
 
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), 10)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
 	user := types.User{
-		FirstName: r.FormValue("first_name"),
-		LastName:  r.FormValue("last_name"),
-		Email:     r.FormValue("email"),
-		Username:  r.FormValue("username"),
-		Password:  r.FormValue("password"),
+		FirstName: data.FirstName,
+		LastName:  data.LastName,
+		Email:     data.Email,
+		Username:  data.Username,
 		Status:    status,
 		CreatedAt: "",
 		CreatedBy: createdBy,
 		UpdatedAt: "",
 		UpdatedBy: updatedBy,
 	}
+
+	user.SetPassword(string(hashPassword))
 
 	err = user_model.Create(&user)
 
@@ -106,10 +114,10 @@ func validateForm(r *http.Request) (types.User, error) {
 	}
 
 	// Validate password
-	data.Password = r.FormValue("password")
-	if data.Password == "" {
+	password := r.FormValue("password")
+	if password == "" {
 		validationErrors = append(validationErrors, "La contraseña es requerida")
-	} else if len(data.Password) < 8 {
+	} else if len(password) < 8 {
 		validationErrors = append(validationErrors, "La contraseña necesita un mínimo de 8 caracteres")
 	}
 

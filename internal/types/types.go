@@ -11,10 +11,18 @@ type User struct {
 	LastName  string `json:"last_name"`
 	Username  string `json:"username"`
 	Email     string `json:"email"`
-	Password  string
+	password  string
 	Status    string `json:"status"`
 	CreatedAt string `json:"created_at"`
 	CreatedBy int    `json:"created_by"`
 	UpdatedAt string `json:"updated_at"`
 	UpdatedBy int    `json:"updated_by"`
+}
+
+func (u *User) GetPassword() string {
+	return u.password
+}
+
+func (u *User) SetPassword(password string) {
+	u.password = password
 }

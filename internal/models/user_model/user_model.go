@@ -18,7 +18,7 @@ func Create(user *types.User) error {
 	query := "INSERT INTO users (first_name, last_name, username, email, password, status, created_by, updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 
 	// Ejecuta la consulta de inserción
-	result, err := db.DB.Exec(query, user.FirstName, user.LastName, user.Username, user.Email, user.Password, user.Status, user.CreatedBy, user.UpdatedBy)
+	result, err := db.DB.Exec(query, user.FirstName, user.LastName, user.Username, user.Email, user.GetPassword(), user.Status, user.CreatedBy, user.UpdatedBy)
 	if err != nil {
 		return err
 	}
