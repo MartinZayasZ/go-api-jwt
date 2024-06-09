@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 )
 
 func JsonResponse(w http.ResponseWriter, data any, httpStatusCode int, cacheTime uint) {
@@ -21,12 +20,13 @@ func JsonResponse(w http.ResponseWriter, data any, httpStatusCode int, cacheTime
 		return
 	}
 
-	w.Header().Set("httpStatusCode", strconv.Itoa(httpStatusCode))
 	w.Header().Set("Content-Type", "application/json")
 
 	if cacheTime > 0 {
 		w.Header().Set("Cache-Control", fmt.Sprintf("max-age: %v, must-revalidate", cacheTime))
 	}
+
+	w.WriteHeader(httpStatusCode)
 
 	_, err = w.Write(responseSB)
 
